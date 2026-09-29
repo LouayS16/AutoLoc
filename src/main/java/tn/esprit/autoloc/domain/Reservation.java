@@ -29,4 +29,14 @@ public class Reservation {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private StatutReservation statut;
+
+    @ManyToOne
+    @JoinColumn(name = "idVehicule", nullable = false)
+    private Vehicule vehicule;
+
+    @ManyToOne
+    @JoinColumn(name = "idClient", nullable = false)
+    private Client client;
+
+
 }
