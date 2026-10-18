@@ -1,6 +1,6 @@
 package tn.esprit.autoloc.service;
 
-import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tn.esprit.autoloc.domain.Agence;
 import tn.esprit.autoloc.repository.AgenceRepository;
@@ -8,10 +8,10 @@ import tn.esprit.autoloc.repository.AgenceRepository;
 import java.util.List;
 
 @Service
-@AllArgsConstructor
 public class AgenceServiceImpl implements IAgenceService {
 
-    private final AgenceRepository agenceRepository;
+    @Autowired
+    private AgenceRepository agenceRepository;
 
     @Override
     public List<Agence> retrieveAllAgences() {

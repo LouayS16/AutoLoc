@@ -37,6 +37,4 @@ public class Reservation {
     @ManyToOne
     @JoinColumn(name = "idClient", nullable = false)
     private Client client;
-
-
 }

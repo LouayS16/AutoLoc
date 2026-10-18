@@ -1,6 +1,5 @@
 package tn.esprit.autoloc.domain;
 
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -48,7 +47,7 @@ public class Vehicule {
     private Agence agence;
 
     @OneToMany(mappedBy = "vehicule", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Reservation>   reservations = new ArrayList<>();
+    private List<Reservation> reservations = new ArrayList<>();
 
     @ManyToMany
     @JoinTable(
@@ -58,6 +57,3 @@ public class Vehicule {
     )
     private List<Equipement> equipements = new ArrayList<>();
 }
-
-
-

@@ -20,6 +20,7 @@ public class Agence {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idAgence;
+
     @OneToMany(mappedBy = "agence", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Vehicule> vehicules = new ArrayList<>();
 
