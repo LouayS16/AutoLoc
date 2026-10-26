@@ -25,6 +25,24 @@ public class ContratServiceImpl implements IContratService {
 
     @Override
     public Contrat updateContrat(Contrat contrat) {
+        if (contrat.getIdContrat() != null) {
+            Contrat existing = contratRepository.findById(contrat.getIdContrat()).orElse(null);
+            if (existing != null) {
+                if (contrat.getDateSignature() != null) {
+                    existing.setDateSignature(contrat.getDateSignature());
+                }
+                if (contrat.getMontantTotal() != null) {
+                    existing.setMontantTotal(contrat.getMontantTotal());
+                }
+                if (contrat.getValide() != null) {
+                    existing.setValide(contrat.getValide());
+                }
+                if (contrat.getReservation() != null && contrat.getReservation().getIdReservation() != null) {
+                    existing.setReservation(contrat.getReservation());
+                }
+                return contratRepository.save(existing);
+            }
+        }
         return contratRepository.save(contrat);
     }
 

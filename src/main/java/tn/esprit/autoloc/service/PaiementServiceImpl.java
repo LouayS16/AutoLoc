@@ -25,6 +25,24 @@ public class PaiementServiceImpl implements IPaiementService {
 
     @Override
     public Paiement updatePaiement(Paiement paiement) {
+        if (paiement.getIdPaiement() != null) {
+            Paiement existing = paiementRepository.findById(paiement.getIdPaiement()).orElse(null);
+            if (existing != null) {
+                if (paiement.getMontant() != null) {
+                    existing.setMontant(paiement.getMontant());
+                }
+                if (paiement.getDatePaiement() != null) {
+                    existing.setDatePaiement(paiement.getDatePaiement());
+                }
+                if (paiement.getModePaiement() != null) {
+                    existing.setModePaiement(paiement.getModePaiement());
+                }
+                if (paiement.getContrat() != null && paiement.getContrat().getIdContrat() != null) {
+                    existing.setContrat(paiement.getContrat());
+                }
+                return paiementRepository.save(existing);
+            }
+        }
         return paiementRepository.save(paiement);
     }
 
