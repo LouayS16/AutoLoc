@@ -4,9 +4,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import tn.esprit.autoloc.domain.Equipement;
+import tn.esprit.autoloc.dto.EquipementDTO;
 import tn.esprit.autoloc.service.IEquipementService;
 
 import java.util.List;
@@ -24,7 +26,7 @@ public class EquipementController {
         @ApiResponse(responseCode = "200", description = "Liste des équipements récupérée avec succès")
     })
     @GetMapping
-    public List<Equipement> retrieveAllEquipements() {
+    public List<EquipementDTO> retrieveAllEquipements() {
         return equipementService.retrieveAllEquipements();
     }
 
@@ -34,36 +36,42 @@ public class EquipementController {
         @ApiResponse(responseCode = "404", description = "Équipement non trouvé")
     })
     @GetMapping("/{id}")
-    public Equipement retrieveEquipement(@PathVariable("id") Long id) {
+    public EquipementDTO retrieveEquipement(@PathVariable("id") Long id) {
         return equipementService.retrieveEquipement(id);
     }
 
     @Operation(summary = "Ajouter un équipement", description = "Crée et enregistre un nouvel équipement")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Équipement créé avec succès"),
+        @ApiResponse(responseCode = "201", description = "Équipement créé avec succès"),
         @ApiResponse(responseCode = "400", description = "Données d'équipement invalides")
     })
     @PostMapping
-    public Equipement addEquipement(@RequestBody Equipement equipement) {
-        return equipementService.addEquipement(equipement);
+    @ResponseStatus(HttpStatus.CREATED)
+    public EquipementDTO addEquipement(@Valid @RequestBody EquipementDTO equipementDTO) {
+        return equipementService.addEquipement(equipementDTO);
     }
 
     @Operation(summary = "Mettre à jour un équipement", description = "Met à jour les informations d'un équipement existant")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Équipement mis à jour avec succès"),
+        @ApiResponse(responseCode = "400", description = "Données d'équipement invalides"),
         @ApiResponse(responseCode = "404", description = "Équipement non trouvé")
     })
-    @PutMapping
-    public Equipement updateEquipement(@RequestBody Equipement equipement) {
-        return equipementService.updateEquipement(equipement);
+    @PutMapping({"", "/{id}"})
+    public EquipementDTO updateEquipement(@Valid @RequestBody EquipementDTO equipementDTO, @PathVariable(name = "id", required = false) Long id) {
+        if (id != null) {
+            equipementDTO.setIdEquipement(id);
+        }
+        return equipementService.updateEquipement(equipementDTO);
     }
 
     @Operation(summary = "Supprimer un équipement", description = "Supprime un équipement selon son identifiant")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Équipement supprimé avec succès"),
+        @ApiResponse(responseCode = "204", description = "Équipement supprimé avec succès"),
         @ApiResponse(responseCode = "404", description = "Équipement non trouvé")
     })
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeEquipement(@PathVariable("id") Long id) {
         equipementService.removeEquipement(id);
     }

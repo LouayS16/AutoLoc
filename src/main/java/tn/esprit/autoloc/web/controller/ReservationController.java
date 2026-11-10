@@ -4,9 +4,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import tn.esprit.autoloc.domain.Reservation;
+import tn.esprit.autoloc.dto.ReservationDTO;
 import tn.esprit.autoloc.service.IReservationService;
 
 import java.util.List;
@@ -24,7 +26,7 @@ public class ReservationController {
         @ApiResponse(responseCode = "200", description = "Liste des réservations récupérée avec succès")
     })
     @GetMapping
-    public List<Reservation> retrieveAllReservations() {
+    public List<ReservationDTO> retrieveAllReservations() {
         return reservationService.retrieveAllReservations();
     }
 
@@ -34,36 +36,42 @@ public class ReservationController {
         @ApiResponse(responseCode = "404", description = "Réservation non trouvée")
     })
     @GetMapping("/{id}")
-    public Reservation retrieveReservation(@PathVariable("id") Long id) {
+    public ReservationDTO retrieveReservation(@PathVariable("id") Long id) {
         return reservationService.retrieveReservation(id);
     }
 
     @Operation(summary = "Ajouter une réservation", description = "Crée et enregistre une nouvelle réservation")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Réservation créée avec succès"),
+        @ApiResponse(responseCode = "201", description = "Réservation créée avec succès"),
         @ApiResponse(responseCode = "400", description = "Données de réservation invalides")
     })
     @PostMapping
-    public Reservation addReservation(@RequestBody Reservation reservation) {
-        return reservationService.addReservation(reservation);
+    @ResponseStatus(HttpStatus.CREATED)
+    public ReservationDTO addReservation(@Valid @RequestBody ReservationDTO reservationDTO) {
+        return reservationService.addReservation(reservationDTO);
     }
 
     @Operation(summary = "Mettre à jour une réservation", description = "Met à jour les informations d'une réservation existante")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Réservation mise à jour avec succès"),
+        @ApiResponse(responseCode = "400", description = "Données de réservation invalides"),
         @ApiResponse(responseCode = "404", description = "Réservation non trouvée")
     })
-    @PutMapping
-    public Reservation updateReservation(@RequestBody Reservation reservation) {
-        return reservationService.updateReservation(reservation);
+    @PutMapping({"", "/{id}"})
+    public ReservationDTO updateReservation(@Valid @RequestBody ReservationDTO reservationDTO, @PathVariable(name = "id", required = false) Long id) {
+        if (id != null) {
+            reservationDTO.setIdReservation(id);
+        }
+        return reservationService.updateReservation(reservationDTO);
     }
 
     @Operation(summary = "Supprimer une réservation", description = "Supprime une réservation selon son identifiant")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Réservation supprimée avec succès"),
+        @ApiResponse(responseCode = "204", description = "Réservation supprimée avec succès"),
         @ApiResponse(responseCode = "404", description = "Réservation non trouvée")
     })
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeReservation(@PathVariable("id") Long id) {
         reservationService.removeReservation(id);
     }

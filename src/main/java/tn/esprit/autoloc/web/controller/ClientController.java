@@ -4,9 +4,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import tn.esprit.autoloc.domain.Client;
+import tn.esprit.autoloc.dto.ClientDTO;
 import tn.esprit.autoloc.service.IClientService;
 
 import java.util.List;
@@ -24,7 +26,7 @@ public class ClientController {
         @ApiResponse(responseCode = "200", description = "Liste des clients récupérée avec succès")
     })
     @GetMapping
-    public List<Client> retrieveAllClients() {
+    public List<ClientDTO> retrieveAllClients() {
         return clientService.retrieveAllClients();
     }
 
@@ -34,47 +36,54 @@ public class ClientController {
         @ApiResponse(responseCode = "404", description = "Client non trouvé")
     })
     @GetMapping("/{id}")
-    public Client retrieveClient(@PathVariable("id") Long id) {
+    public ClientDTO retrieveClient(@PathVariable("id") Long id) {
         return clientService.retrieveClient(id);
     }
 
     @Operation(summary = "Ajouter un client", description = "Crée et enregistre un nouveau client")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Client créé avec succès"),
+        @ApiResponse(responseCode = "201", description = "Client créé avec succès"),
         @ApiResponse(responseCode = "400", description = "Données du client invalides")
     })
     @PostMapping
-    public Client addClient(@RequestBody Client client) {
-        return clientService.addClient(client);
+    @ResponseStatus(HttpStatus.CREATED)
+    public ClientDTO addClient(@Valid @RequestBody ClientDTO clientDTO) {
+        return clientService.addClient(clientDTO);
     }
 
     @Operation(summary = "Mettre à jour un client", description = "Met à jour les informations d'un client existant")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Client mis à jour avec succès"),
+        @ApiResponse(responseCode = "400", description = "Données du client invalides"),
         @ApiResponse(responseCode = "404", description = "Client non trouvé")
     })
-    @PutMapping
-    public Client updateClient(@RequestBody Client client) {
-        return clientService.updateClient(client);
+    @PutMapping({"", "/{id}"})
+    public ClientDTO updateClient(@Valid @RequestBody ClientDTO clientDTO, @PathVariable(name = "id", required = false) Long id) {
+        if (id != null) {
+            clientDTO.setIdClient(id);
+        }
+        return clientService.updateClient(clientDTO);
     }
 
     @Operation(summary = "Supprimer un client", description = "Supprime un client selon son identifiant")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Client supprimé avec succès"),
+        @ApiResponse(responseCode = "204", description = "Client supprimé avec succès"),
         @ApiResponse(responseCode = "404", description = "Client non trouvé")
     })
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeClient(@PathVariable("id") Long id) {
         clientService.removeClient(id);
     }
 
     @Operation(summary = "Ajouter une liste de clients", description = "Crée et enregistre plusieurs clients en une seule requête")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Clients créés avec succès"),
+        @ApiResponse(responseCode = "201", description = "Clients créés avec succès"),
         @ApiResponse(responseCode = "400", description = "Données invalides fournies")
     })
     @PostMapping("/batch")
-    public List<Client> addClients(@RequestBody List<Client> clients) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public List<ClientDTO> addClients(@Valid @RequestBody List<ClientDTO> clients) {
         return clientService.addClients(clients);
     }
 }
