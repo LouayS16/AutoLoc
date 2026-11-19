@@ -15,7 +15,7 @@ import java.util.List;
 
 @Tag(name = "Véhicules", description = "API de gestion du parc de véhicules")
 @RestController
-@RequestMapping("/api/vehicules")
+@RequestMapping({"/api/vehicules", "/vehicules"})
 public class VehiculeController {
 
     @Autowired
@@ -74,5 +74,29 @@ public class VehiculeController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeVehicule(@PathVariable("id") Long id) {
         vehiculeService.removeVehicule(id);
+    }
+
+    @Operation(summary = "Affecter un équipement à un véhicule", description = "Associe un équipement existant à un véhicule")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Équipement affecté au véhicule avec succès"),
+        @ApiResponse(responseCode = "404", description = "Véhicule ou équipement non trouvé")
+    })
+    @PutMapping("/{idVehicule}/affecter-equipement/{idEquipement}")
+    public VehiculeDTO affecterVehiculeAEquipement(
+            @PathVariable("idVehicule") Long idVehicule,
+            @PathVariable("idEquipement") Long idEquipement) {
+        return vehiculeService.affecterVehiculeAEquipement(idVehicule, idEquipement);
+    }
+
+    @Operation(summary = "Affecter une maintenance à un véhicule", description = "Crée une opération de maintenance et l'affecte au véhicule selon son immatriculation")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Maintenance affectée au véhicule avec succès"),
+        @ApiResponse(responseCode = "404", description = "Véhicule non trouvé")
+    })
+    @PostMapping("/affecter-maintenance")
+    public VehiculeDTO affecterMaintenanceAvehicule(
+            @RequestParam("description") String description,
+            @RequestParam("immatriculation") String immatriculation) {
+        return vehiculeService.affecterMaintenanceAvehicule(description, immatriculation);
     }
 }

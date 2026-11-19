@@ -6,11 +6,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import tn.esprit.autoloc.dto.ContratDTO;
 import tn.esprit.autoloc.service.IContratService;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Tag(name = "Contrats", description = "API de gestion des contrats de location")
@@ -74,5 +76,18 @@ public class ContratController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeContrat(@PathVariable("id") Long id) {
         contratService.removeContrat(id);
+    }
+
+    @Operation(summary = "Affecter un contrat à une réservation", description = "Crée ou met à jour le contrat associé à une réservation définie par ses dates de début et de fin")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Contrat affecté à la réservation avec succès"),
+        @ApiResponse(responseCode = "404", description = "Réservation non trouvée pour la période spécifiée")
+    })
+    @PostMapping("/affecter-reservation")
+    public ContratDTO affecterContratAReservation(
+            @RequestParam("dateSignature") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateSignature,
+            @RequestParam("dateDebut") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateDebut,
+            @RequestParam("dateFin") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFin) {
+        return contratService.affecterContratAReservation(dateSignature, dateDebut, dateFin);
     }
 }

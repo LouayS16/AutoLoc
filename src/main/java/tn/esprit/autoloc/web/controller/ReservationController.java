@@ -9,13 +9,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import tn.esprit.autoloc.dto.ReservationDTO;
+import tn.esprit.autoloc.dto.ReservationResponseDTO;
+import tn.esprit.autoloc.dto.ReservationWithContratRequestDTO;
 import tn.esprit.autoloc.service.IReservationService;
 
 import java.util.List;
 
 @Tag(name = "Réservations", description = "API de gestion des réservations de véhicules")
 @RestController
-@RequestMapping("/api/reservations")
+@RequestMapping({"/api/reservations", "/reservations"})
 public class ReservationController {
 
     @Autowired
@@ -74,5 +76,37 @@ public class ReservationController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeReservation(@PathVariable("id") Long id) {
         reservationService.removeReservation(id);
+    }
+
+    @Operation(summary = "Affecter une réservation à un client", description = "Associe une réservation existante à un client désigné par son nom et prénom")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Réservation affectée au client avec succès"),
+        @ApiResponse(responseCode = "404", description = "Réservation ou client non trouvé")
+    })
+    @PutMapping({
+        "/affecterReservationAClient/{idReservation}",
+        "/{idReservation}/affecter-client",
+        "/affecterReservationAClient"
+    })
+    public ReservationResponseDTO affecterReservationAClient(
+            @PathVariable(value = "idReservation", required = false) Long pathIdReservation,
+            @RequestParam(value = "idReservation", required = false) Long paramIdReservation,
+            @RequestParam("nom") String nom,
+            @RequestParam("prenom") String prenom) {
+        Long idRes = pathIdReservation != null ? pathIdReservation : paramIdReservation;
+        return reservationService.affecterReservationAClient(idRes, nom, prenom);
+    }
+
+    @Operation(summary = "Affecter une réservation et son contrat associé", description = "Crée et affecte simultanément une réservation et son contrat de location associé")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Réservation et contrat créés/affectés avec succès"),
+        @ApiResponse(responseCode = "400", description = "Données invalides"),
+        @ApiResponse(responseCode = "404", description = "Véhicule ou client non trouvé")
+    })
+    @PostMapping({"/affecterReservationEtContratAssocie", "/creerReservationEtContratAssocie"})
+    @ResponseStatus(HttpStatus.CREATED)
+    public ReservationResponseDTO affecterReservationEtContratAssocie(
+            @Valid @RequestBody ReservationWithContratRequestDTO requestDTO) {
+        return reservationService.affecterReservationEtContratAssocie(requestDTO);
     }
 }

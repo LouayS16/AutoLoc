@@ -10,4 +10,7 @@ public interface IVehiculeService {
     VehiculeDTO updateVehicule(VehiculeDTO vehiculeDTO);
     VehiculeDTO retrieveVehicule(Long idVehicule);
     void removeVehicule(Long idVehicule);
+
+    VehiculeDTO affecterVehiculeAEquipement(Long idVehicule, Long idEquipement);
+    VehiculeDTO affecterMaintenanceAvehicule(String description, String immatriculation);
 }

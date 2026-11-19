@@ -137,6 +137,16 @@ public class AutoLocControllerValidationTest {
             @Override
             public void removeVehicule(Long idVehicule) {
             }
+
+            @Override
+            public VehiculeDTO affecterVehiculeAEquipement(Long idVehicule, Long idEquipement) {
+                return null;
+            }
+
+            @Override
+            public VehiculeDTO affecterMaintenanceAvehicule(String description, String immatriculation) {
+                return null;
+            }
         };
 
         // Stub pour IAgenceService

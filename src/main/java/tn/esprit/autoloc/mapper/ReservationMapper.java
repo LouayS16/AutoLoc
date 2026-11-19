@@ -2,9 +2,11 @@ package tn.esprit.autoloc.mapper;
 
 import org.springframework.stereotype.Component;
 import tn.esprit.autoloc.domain.Client;
+import tn.esprit.autoloc.domain.Contrat;
 import tn.esprit.autoloc.domain.Reservation;
 import tn.esprit.autoloc.domain.Vehicule;
 import tn.esprit.autoloc.dto.ReservationDTO;
+import tn.esprit.autoloc.dto.ReservationResponseDTO;
 
 @Component
 public class ReservationMapper {
@@ -56,5 +58,41 @@ public class ReservationMapper {
 
         return reservation;
     }
-}
 
+    public ReservationResponseDTO toResponseDto(Reservation reservation) {
+        return toResponseDto(reservation, null);
+    }
+
+    public ReservationResponseDTO toResponseDto(Reservation reservation, Contrat contrat) {
+        if (reservation == null) {
+            return null;
+        }
+        ReservationResponseDTO.ReservationResponseDTOBuilder builder = ReservationResponseDTO.builder()
+                .idReservation(reservation.getIdReservation())
+                .dateDebut(reservation.getDateDebut())
+                .dateFin(reservation.getDateFin())
+                .statut(reservation.getStatut());
+
+        if (reservation.getVehicule() != null) {
+            builder.idVehicule(reservation.getVehicule().getIdVehicule())
+                    .immatriculationVehicule(reservation.getVehicule().getImmatriculation())
+                    .marqueVehicule(reservation.getVehicule().getMarque())
+                    .modeleVehicule(reservation.getVehicule().getModele());
+        }
+
+        if (reservation.getClient() != null) {
+            builder.idClient(reservation.getClient().getIdClient())
+                    .nomClient(reservation.getClient().getNom())
+                    .prenomClient(reservation.getClient().getPrenom());
+        }
+
+        if (contrat != null) {
+            builder.idContrat(contrat.getIdContrat())
+                    .dateSignatureContrat(contrat.getDateSignature())
+                    .montantTotalContrat(contrat.getMontantTotal())
+                    .contratValide(contrat.getValide());
+        }
+
+        return builder.build();
+    }
+}
